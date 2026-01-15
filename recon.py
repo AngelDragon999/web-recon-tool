@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-Web Recon Tool - Skeleton
+Web Recon Tool
 Author: AngelDragon999
 Description: Simple tool for reconnaissance web
 """
@@ -9,11 +9,27 @@ Description: Simple tool for reconnaissance web
 # Libraries
 import argparse
 import sys
+import dns.resolver
 
-def main ():
+
+def dns_recon(domain):
+    print(f"\n[+] Recon for {domain}\n")
+
+    records = ["A", "NS", "MX", "TXT"]
+
+    for record in records:
+        try:
+            answers = dns.resolver.resolve(domain, record)
+            for rdata in answers:
+                print(f"{record}: {rdata}")
+        except Exception:
+            pass
+
+
+def main():
     
     # Parsers for imput command from command line
-    parser = argparse.ArgumentDefaultsHelpFormatter(
+    parser = argparse.ArgumentParser(
         description="Simple Web Recon Tool"
     )
 
@@ -33,6 +49,9 @@ def main ():
 
     # Starting message
     print(f"[+] Starting reconnaissance on: {domain}")
+
+    # Call my method for dns recon
+    dns_recon(domain)
 
 # Starting main method
 
