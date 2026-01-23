@@ -8,23 +8,9 @@ Description: Simple tool for reconnaissance web
 
 # Libraries
 import argparse
-import sys
-import dns.resolver
-
-
-def dns_recon(domain):
-    print(f"\n[+] Recon for {domain}\n")
-
-    records = ["A", "NS", "MX", "TXT"]
-
-    for record in records:
-        try:
-            answers = dns.resolver.resolve(domain, record)
-            for rdata in answers:
-                print(f"{record}: {rdata}")
-        except Exception:
-            pass
-
+from  utils import info, section, item, warn
+from dns_recon import dns_recon
+from subdomain_enum import enumerate_subdomains
 
 def main():
     
@@ -48,10 +34,27 @@ def main():
     domain = args.domain
 
     # Starting message
-    print(f"[+] Starting reconnaissance on: {domain}")
+    info(f"\n[+] Starting reconnaissance on: {domain}\n")
+
+    # Print title of this program
+    section("DNS RECORDS")
 
     # Call my method for dns recon
     dns_recon(domain)
+
+    # Control for subdomains
+    section("SUBDOMAINS")
+
+    with open("subdomains.txt") as file:
+        words = [line.strip() for line in file]
+
+    subdomains = enumerate_subdomains(domain, words)
+
+    if subdomains:
+        for subdomain in subdomains:
+            item(subdomain)
+    else:
+        warn("Mamma mia! No subdomains found!")
 
 # Starting main method
 
